@@ -2,6 +2,7 @@ from typing import List, Optional
 from .node import AbstractNode, Node
 from .link import Link
 from .interaction import Interaction
+from .style_class import Style, StyleClass
 
 DIAGRAM_TYPES = {
     "default": "graph",
@@ -26,6 +27,7 @@ class MermaidDiagram:
         nodes: List[Node] = [],
         links: List[Link] = [],
         interactions: List[Interaction] = [],
+        style_classes: List[StyleClass] = [],
         type="default",
         orientation="default"
     ):
@@ -33,6 +35,7 @@ class MermaidDiagram:
         self.nodes = nodes
         self.links = links
         self.interactions = interactions
+        self.style_classes = style_classes
         self.type = DIAGRAM_TYPES[type]
         self.orientation = DIAGRAM_ORIENTATION[orientation]
         self.startNode = None
@@ -44,6 +47,9 @@ class MermaidDiagram:
     def add_links(self, links=[]):
         self.links += links
 
+    def add_style_class(self, style_class=[]):
+        self.style_classes += style_class
+
     def add_start_and_end_nodes(self, 
                                 start_node:Optional[AbstractNode] = None, 
                                 end_node:Optional[AbstractNode] = None):
@@ -51,6 +57,9 @@ class MermaidDiagram:
         self.endNode = end_node # type: ignore
 
     def __get_graph_str(self):
+        style_classes_string = (
+            '\n'.join([str(style_class) for style_class in self.style_classes])
+        )
         nodes_string = (
             '\n'.join([str(node) for node in self.nodes])
         )
@@ -65,6 +74,7 @@ class MermaidDiagram:
                 None,
                 [
                     f"{self.type} {self.orientation}",
+                    style_classes_string,
                     nodes_string,
                     links_string,
                     interactions_string
@@ -74,6 +84,9 @@ class MermaidDiagram:
         return '\n'.join(final_strings)
     
     def __get_state_diagram_str(self):
+        style_classes_string = (
+            '\n'.join([str(style_class) for style_class in self.style_classes])
+        )
         nodes_string = (
             '\n'.join([str(node) for node in self.nodes if str(node)!=""])
         )
@@ -85,6 +98,7 @@ class MermaidDiagram:
                 None,
                 [
                     f"{self.type}",
+                    style_classes_string,
                     nodes_string,
                     f"[*] --> {self.startNode.id}" if self.startNode else None,
                     links_string,

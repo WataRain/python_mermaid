@@ -1,6 +1,6 @@
 from typing import List
 from .utils import snake_case
-
+from .style_class import Style, StyleClass
 
 class NodeShape:
     def __init__(self, start: str, end: str):
@@ -47,10 +47,14 @@ class Node(AbstractNode):
         content: str = "",
         shape: str = "normal",
         sub_nodes: List = [],
+        style_class: StyleClass = None,
+        style: Style = ""
     ):
         super().__init__(id, content)
         self.shape = NODE_SHAPES[shape]
         self.sub_nodes = sub_nodes
+        self.style_class = style_class
+        self.style = style
 
         # TODO: verify that content match a working string pattern
 
@@ -75,6 +79,10 @@ class Node(AbstractNode):
                 '"' + self.content + '"',
                 self.shape.end
             ])
+            if self.style_class:
+                s += f':::{self.style_class.id}'
+            if self.style:
+                s += f'\nstyle {self.id} {self.style}'
         return s
 
 class StateNode(AbstractNode):
